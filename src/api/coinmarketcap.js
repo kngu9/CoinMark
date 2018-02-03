@@ -4,9 +4,7 @@ const API_URI = 'https://api.coinmarketcap.com/v1/';
 const GRAPH_URI = 'https://graphs2.coinmarketcap.com/currencies/';
 
 const getTicker = async (page) => {
-  let body = null;
-
-  body = await fetch(`${API_URI}ticker/?start=${page * 30}&limit=30`);
+  const body = await fetch(`${API_URI}ticker/`);
 
   return await body.json();
 }

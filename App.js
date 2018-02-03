@@ -15,8 +15,8 @@ const persistConfig = {
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
-const store = createStore(persistedReducer, applyMiddleware(logger))
-const persistor = persistStore(store)
+const store = createStore(persistedReducer, applyMiddleware(logger));
+const persistor = persistStore(store);
 
 export default class App extends React.Component {
   render() {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { connect } from "react-redux";
 import { Ionicons } from '@expo/vector-icons';
 import { Column as Col, Row } from 'react-native-flexbox-grid';
@@ -7,12 +7,13 @@ import { LineChart } from 'react-native-svg-charts'
 import * as shape from 'd3-shape'
 import moment from 'moment';
 
-import { getTicker, getHistorical } from '../api/coinmarketcap';
-import { updateCrypto, updatePage } from '../actions/crypto';
+import { getTicker } from '../api/coinmarketcap';
+import { updateCrypto } from '../actions/crypto';
 
 class HomeScreen extends React.Component {
   state = {
-    isLoading: false
+    isLoading: false,
+    currentView: 'percent'
   };
 
   static navigationOptions = {
@@ -27,13 +28,18 @@ class HomeScreen extends React.Component {
 
   renderCryptoItem({item}) {
     let percentColor = '#CCCCCC';
-    const data = [ 50, 10, 40, 95, -4, -24, 85, 91, 35, 53, -53, 24, 50, -20, -80 ];
     const percentChanged = parseFloat(item.percent_change_24h);
 
     if (percentChanged < 0.0) {
       percentColor = '#F45532';
     } else if (percentChanged > 0.0) {
       percentColor = '#30CC9A';
+    }
+
+    let coinValue = `${item.percent_change_24h} %`;
+
+    if (this.state.currentView === 'money') {
+      coinValue = `$${Math.round(100*parseFloat(item.price_usd))/100}`;
     }
 
     return (
@@ -47,47 +53,35 @@ class HomeScreen extends React.Component {
               {item.symbol}
             </Text>
           </Col>
-          <Col sm={4} md={4} lg={3} style={styles.cryptoItemCenter}>
-            <LineChart
-                    style={{
-                      height: 40,
-                      width: 100,
-                      padding: 5,
-                      flex: 1,
-                      justifyContent: 'center'
-                    }}
-                    animate={false}
-                    dataPoints={ data }
-                    fillColor={ percentColor }
-                    shadowOffset={3}
-                    svg={{
-                        stroke: percentColor,
-                    }}
-                    shadowSvg={{
-                        stroke: percentColor,
-                        strokeWidth: 3,
-                    }}
-                    contentInset={ { top: 20, bottom: 20 } }
-                    curve={shape.curveLinear}
-                    showGrid={false}
-                />
+          <Col sm={4} md={2} lg={3} style={styles.cryptoItemCenter}>
+
           </Col>
-          <Col sm={4} md={4} lg={3} style={styles.cryptoItemEnd}>
-            <View style={[styles.percentChange, {backgroundColor: percentColor}]}>
+          <Col sm={4} md={6} lg={3} style={styles.cryptoItemEnd}>
+            <TouchableOpacity
+              activeOpacity={1}
+              style={[styles.percentChange, {backgroundColor: percentColor}]}
+              onPress={() => this.changeView()}>
               <Text style={styles.percentText}>
-                {item.percent_change_24h}
+                { coinValue }
               </Text>
-            </View>
+            </TouchableOpacity>
           </Col>
         </Row>
       </View>
     );
   }
 
-  async loadGraphData(data) {
-    for (let d of data) {
-      // let graph = await getHistorical(d.id, 7);
-      // console.log(graph);
+  changeView () {
+    switch(this.state.currentView) {
+      case 'percent':
+        this.setState({currentView: 'money'});
+        break;
+      case 'money':
+        this.setState({currentView: 'percent'});
+        break;
+      default:
+        this.setState({currentView: 'percent'});
+        break;
     }
   }
 
@@ -98,28 +92,14 @@ class HomeScreen extends React.Component {
           isLoading: true
         },
         async () => {
-          let data = await getTicker(0);
-          let graphData = await this.loadGraphData(data);
+          let data = await getTicker();
 
           this.props.updateCrypto(data);
-          this.props.updatePage(1);
 
           this.setState({ isLoading: false });
         }
       );
     }
-  }
-
-  async fetchMoreData() {
-    let data = await getTicker(this.props.crypto.pageNumber + 1);
-    let temp = this.props.crypto.data;
-    
-    for (let d of data) {
-      temp.push(d);
-    }
-
-    this.props.updateCrypto(temp);
-    this.props.updatePage(this.props.crypto.pageNumber + 1);
   }
 
   render() {
@@ -133,8 +113,6 @@ class HomeScreen extends React.Component {
             data={this.props.crypto.data}
             renderItem={(item) => this.renderCryptoItem(item)}
             showsVerticalScrollIndicator={false}
-            onEndReachedThreshold={0.50}
-            onEndReached={() => this.fetchMoreData()}
           >
           </FlatList>
         </View>
@@ -181,7 +159,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 60,
+    width: 90,
     paddingVertical: 5,
     borderRadius: 5
   },
@@ -198,8 +176,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    updateCrypto: (newData) => dispatch(updateCrypto(newData)),
-    updatePage: (pageNumber) => dispatch(updatePage(pageNumber))
+    updateCrypto: (newData) => dispatch(updateCrypto(newData))
   };
 }
 
