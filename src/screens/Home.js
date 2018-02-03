@@ -22,19 +22,7 @@ class HomeScreen extends React.Component {
   };
 
   async componentDidMount () {
-    if (moment(this.props.crypto.lastReloaded).diff(new Date(), 'minutes') <= 5) {
-      this.setState(
-        {
-          isLoading: true
-        },
-        async () => {
-          let data = await getTicker();
-          this.props.updateCrypto(data);
-
-          this.setState({ isLoading: false });
-        }
-      );
-    }
+    await this.reloadData()
   }
 
   renderCryptoItem({item}) {
@@ -50,49 +38,65 @@ class HomeScreen extends React.Component {
 
     return (
       <View style={styles.cryptoItem}>
-      <Row size={12}>
-        <Col sm={4} md={4} lg={3} style={styles.cryptoItemStart}>
-          <Text style={styles.coinName}>
-            {item.name}
-          </Text>
-          <Text style={styles.coinSymbol}>
-            {item.symbol}
-          </Text>
-        </Col>
-        <Col sm={4} md={4} lg={3} style={styles.cryptoItemCenter}>
-          <LineChart
-                  style={{
-                    height: 40,
-                    width: 100,
-                    padding: 5,
-                    flex: 1,
-                    justifyContent: 'center'
-                  }}
-                  dataPoints={ data }
-                  fillColor={ percentColor }
-                  shadowOffset={3}
-                  svg={{
-                      stroke: percentColor,
-                  }}
-                  shadowSvg={{
-                      stroke: percentColor,
-                      strokeWidth: 3,
-                  }}
-                  contentInset={ { top: 20, bottom: 20 } }
-                  curve={shape.curveLinear}
-                  showGrid={false}
-              />
-        </Col>
-        <Col sm={4} md={4} lg={3} style={styles.cryptoItemEnd}>
-          <View style={[styles.percentChange, {backgroundColor: percentColor}]}>
-            <Text style={styles.percentText}>
-              {item.percent_change_24h}
+        <Row size={12}>
+          <Col sm={4} md={4} lg={3} style={styles.cryptoItemStart}>
+            <Text style={styles.coinName}>
+              {item.name}
             </Text>
-          </View>
-        </Col>
-      </Row>
+            <Text style={styles.coinSymbol}>
+              {item.symbol}
+            </Text>
+          </Col>
+          <Col sm={4} md={4} lg={3} style={styles.cryptoItemCenter}>
+            <LineChart
+                    style={{
+                      height: 40,
+                      width: 100,
+                      padding: 5,
+                      flex: 1,
+                      justifyContent: 'center'
+                    }}
+                    dataPoints={ data }
+                    fillColor={ percentColor }
+                    shadowOffset={3}
+                    svg={{
+                        stroke: percentColor,
+                    }}
+                    shadowSvg={{
+                        stroke: percentColor,
+                        strokeWidth: 3,
+                    }}
+                    contentInset={ { top: 20, bottom: 20 } }
+                    curve={shape.curveLinear}
+                    showGrid={false}
+                />
+          </Col>
+          <Col sm={4} md={4} lg={3} style={styles.cryptoItemEnd}>
+            <View style={[styles.percentChange, {backgroundColor: percentColor}]}>
+              <Text style={styles.percentText}>
+                {item.percent_change_24h}
+              </Text>
+            </View>
+          </Col>
+        </Row>
       </View>
     );
+  }
+
+  async reloadData () {
+    if (moment(this.props.crypto.lastReloaded).diff(new Date(), 'minutes') <= 5) {
+      this.setState(
+        {
+          isLoading: true
+        },
+        async () => {
+          let data = await getTicker();
+          this.props.updateCrypto(data);
+
+          this.setState({ isLoading: false });
+        }
+      );
+    }
   }
 
   render() {
@@ -100,9 +104,12 @@ class HomeScreen extends React.Component {
       <View style={styles.container}>
         <View style={styles.cryptoList}>
           <FlatList
+            refreshing={this.state.isLoading}
+            onRefresh={() => this.reloadData()}
             keyExtractor={(item, index) => item.id}
             data={this.props.crypto.data}
             renderItem={(item) => this.renderCryptoItem(item)}
+            showsVerticalScrollIndicator={false}
           >
           </FlatList>
         </View>
