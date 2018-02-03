@@ -1,6 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
 import { connect } from "react-redux";
+import { Ionicons } from '@expo/vector-icons';
+import { Column as Col, Row } from 'react-native-flexbox-grid';
+import { LineChart } from 'react-native-svg-charts'
+import * as shape from 'd3-shape'
 import moment from 'moment';
 
 import { getTicker } from '../api/coinmarketcap';
@@ -9,6 +13,12 @@ import { updateCrypto, setLoading } from '../actions/crypto';
 class HomeScreen extends React.Component {
   state = {
     isLoading: false
+  };
+
+  static navigationOptions = {
+    tabBarIcon: ({ tintColor }) => (
+      <Ionicons name="ios-home" size={32} color={tintColor} />
+    ),
   };
 
   async componentDidMount () {
@@ -28,11 +38,59 @@ class HomeScreen extends React.Component {
   }
 
   renderCryptoItem({item}) {
+    let percentColor = '#CCCCCC';
+    const data = [ 50, 10, 40, 95, -4, -24, 85, 91, 35, 53, -53, 24, 50, -20, -80 ];
+    const percentChanged = parseFloat(item.percent_change_24h);
+
+    if (percentChanged < 0.0) {
+      percentColor = '#F45532';
+    } else if (percentChanged > 0.0) {
+      percentColor = '#30CC9A';
+    }
+
     return (
       <View style={styles.cryptoItem}>
-        <Text style={styles.coinName}>
-          {item.name}
-        </Text>
+      <Row size={12}>
+        <Col sm={4} md={4} lg={3} style={styles.cryptoItemStart}>
+          <Text style={styles.coinName}>
+            {item.name}
+          </Text>
+          <Text style={styles.coinSymbol}>
+            {item.symbol}
+          </Text>
+        </Col>
+        <Col sm={4} md={4} lg={3} style={styles.cryptoItemCenter}>
+          <LineChart
+                  style={{
+                    height: 40,
+                    width: 100,
+                    padding: 5,
+                    flex: 1,
+                    justifyContent: 'center'
+                  }}
+                  dataPoints={ data }
+                  fillColor={ percentColor }
+                  shadowOffset={3}
+                  svg={{
+                      stroke: percentColor,
+                  }}
+                  shadowSvg={{
+                      stroke: percentColor,
+                      strokeWidth: 3,
+                  }}
+                  contentInset={ { top: 20, bottom: 20 } }
+                  curve={shape.curveLinear}
+                  showGrid={false}
+              />
+        </Col>
+        <Col sm={4} md={4} lg={3} style={styles.cryptoItemEnd}>
+          <View style={[styles.percentChange, {backgroundColor: percentColor}]}>
+            <Text style={styles.percentText}>
+              {item.percent_change_24h}
+            </Text>
+          </View>
+        </Col>
+      </Row>
       </View>
     );
   }
@@ -55,22 +113,48 @@ class HomeScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#040D14'
+    flex: 1
   },
   cryptoList: {
     marginTop: 20,
     paddingHorizontal: 5
   },
   cryptoItem: {
-    paddingVertical: 30,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 18,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#D6D7DA'
+    borderBottomColor: '#040D14'
   },
   coinName: {
-    fontSize: 14,
-    color: '#D6D7DA',
+    fontSize: 13,
+    color: '#040D14',
     fontWeight: "600"
+  },
+  coinSymbol: {
+    fontSize: 10,
+    color: '#7F7F7F'
+  },
+  cryptoItemStart: {
+    paddingVertical: 5
+  },
+  cryptoItemCenter: {
+    alignItems: 'center'
+  },
+  cryptoItemEnd: {
+    alignItems: 'flex-end'
+  },
+  percentChange: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 60,
+    paddingVertical: 5,
+    borderRadius: 5
+  },
+  percentText: {
+    color: 'white'
   }
 });
 
