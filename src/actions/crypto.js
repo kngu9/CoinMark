@@ -7,11 +7,11 @@ const updateCrypto = (newData) => {
   }
 };
 
-const setLoading = (loading) => {
+const updatePage = (pageNumber) => {
   return {
-    type: actionTypes.SET_CRYPTO_LOADING,
-    loading
+    type: actionTypes.UPDATE_CRYPTO_PAGE,
+    pageNumber
   }
 }
 
-export { updateCrypto };
+export { updateCrypto, updatePage };

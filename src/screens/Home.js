@@ -7,8 +7,8 @@ import { LineChart } from 'react-native-svg-charts'
 import * as shape from 'd3-shape'
 import moment from 'moment';
 
-import { getTicker } from '../api/coinmarketcap';
-import { updateCrypto, setLoading } from '../actions/crypto';
+import { getTicker, getHistorical } from '../api/coinmarketcap';
+import { updateCrypto, updatePage } from '../actions/crypto';
 
 class HomeScreen extends React.Component {
   state = {
@@ -56,6 +56,7 @@ class HomeScreen extends React.Component {
                       flex: 1,
                       justifyContent: 'center'
                     }}
+                    animate={false}
                     dataPoints={ data }
                     fillColor={ percentColor }
                     shadowOffset={3}
@@ -83,6 +84,13 @@ class HomeScreen extends React.Component {
     );
   }
 
+  async loadGraphData(data) {
+    for (let d of data) {
+      // let graph = await getHistorical(d.id, 7);
+      // console.log(graph);
+    }
+  }
+
   async reloadData () {
     if (moment(this.props.crypto.lastReloaded).diff(new Date(), 'minutes') <= 5) {
       this.setState(
@@ -90,13 +98,28 @@ class HomeScreen extends React.Component {
           isLoading: true
         },
         async () => {
-          let data = await getTicker();
+          let data = await getTicker(0);
+          let graphData = await this.loadGraphData(data);
+
           this.props.updateCrypto(data);
+          this.props.updatePage(1);
 
           this.setState({ isLoading: false });
         }
       );
     }
+  }
+
+  async fetchMoreData() {
+    let data = await getTicker(this.props.crypto.pageNumber + 1);
+    let temp = this.props.crypto.data;
+    
+    for (let d of data) {
+      temp.push(d);
+    }
+
+    this.props.updateCrypto(temp);
+    this.props.updatePage(this.props.crypto.pageNumber + 1);
   }
 
   render() {
@@ -110,6 +133,8 @@ class HomeScreen extends React.Component {
             data={this.props.crypto.data}
             renderItem={(item) => this.renderCryptoItem(item)}
             showsVerticalScrollIndicator={false}
+            onEndReachedThreshold={0.50}
+            onEndReached={() => this.fetchMoreData()}
           >
           </FlatList>
         </View>
@@ -123,7 +148,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   cryptoList: {
-    marginTop: 20,
+    marginTop: 25,
     paddingHorizontal: 5
   },
   cryptoItem: {
@@ -174,7 +199,7 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     updateCrypto: (newData) => dispatch(updateCrypto(newData)),
-    setLoading: (loading) => dispatch(setLoading(loading))
+    updatePage: (pageNumber) => dispatch(updatePage(pageNumber))
   };
 }
 
