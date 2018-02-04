@@ -38,7 +38,7 @@ class HomeScreen extends React.Component {
     let coinValue = `${item.percent_change_24h} %`;
 
     if (this.state.currentView === 'money') {
-      coinValue = `$${Math.round(100*parseFloat(item.price_usd))/100}`;
+      coinValue = `$${(Math.round(100*parseFloat(item.price_usd))/100).toFixed(2)}`;
     }
 
     return (
