@@ -25,7 +25,7 @@
     "react": "16.2.0",
     "react-native": "0.52.0",
     "react-native-flexbox-grid": "^0.3.2",
-    "react-native-svg-charts": "^2.2.2",
+    "react-native-svg": "^6.1.3",
     "react-navigation": "^1.0.0-beta.27",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",

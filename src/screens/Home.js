@@ -3,7 +3,6 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native
 import { connect } from "react-redux";
 import { Ionicons } from '@expo/vector-icons';
 import { Column as Col, Row } from 'react-native-flexbox-grid';
-import { LineChart } from 'react-native-svg-charts'
 import * as shape from 'd3-shape'
 import moment from 'moment';
 
