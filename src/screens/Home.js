@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, TextInput } from 'react-native';
+import { Header, Left, Body, Right, Button, Title, List } from 'native-base';
 import { connect } from "react-redux";
 import { Ionicons } from '@expo/vector-icons';
 import { Column as Col, Row } from 'react-native-flexbox-grid';
@@ -17,7 +18,7 @@ class HomeScreen extends React.Component {
 
   static navigationOptions = {
     tabBarIcon: ({ tintColor }) => (
-      <Ionicons name="ios-home" size={32} color={tintColor} />
+      <Ionicons name="md-home" size={32} color={tintColor} />
     ),
   };
 
@@ -42,9 +43,12 @@ class HomeScreen extends React.Component {
     }
 
     return (
-      <View style={styles.cryptoItem}>
+      <TouchableOpacity
+        activeOpacity={1}
+        style={styles.cryptoItem}
+      >
         <Row size={12}>
-          <Col sm={4} md={4} lg={3} style={styles.cryptoItemStart}>
+          <Col sm={6} md={6} lg={6} style={styles.cryptoItemStart}>
             <Text style={styles.coinName}>
               {item.name}
             </Text>
@@ -52,10 +56,7 @@ class HomeScreen extends React.Component {
               {item.symbol}
             </Text>
           </Col>
-          <Col sm={4} md={2} lg={3} style={styles.cryptoItemCenter}>
-
-          </Col>
-          <Col sm={4} md={6} lg={3} style={styles.cryptoItemEnd}>
+          <Col sm={6} md={6} lg={6} style={styles.cryptoItemEnd}>
             <TouchableOpacity
               activeOpacity={1}
               style={[styles.percentChange, {backgroundColor: percentColor}]}
@@ -66,7 +67,7 @@ class HomeScreen extends React.Component {
             </TouchableOpacity>
           </Col>
         </Row>
-      </View>
+      </TouchableOpacity>
     );
   }
 
@@ -101,20 +102,40 @@ class HomeScreen extends React.Component {
     }
   }
 
-  render() {
+  renderHeader () {
+    return (
+      <View style={styles.filterBar}>
+        <TextInput
+          style={styles.filterBarText}
+          autoCorrect={false}
+          placeholder='Filter'
+        />
+      </View>
+    );
+  };
+
+  render () {
     return (
       <View style={styles.container}>
-        <View style={styles.cryptoList}>
-          <FlatList
-            refreshing={this.state.isLoading}
-            onRefresh={() => this.reloadData()}
-            keyExtractor={(item, index) => item.id}
-            data={this.props.crypto.data}
-            renderItem={(item) => this.renderCryptoItem(item)}
-            showsVerticalScrollIndicator={false}
-          >
-          </FlatList>
-        </View>
+        <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}>
+          <Header>
+            <Body>
+              <Title>Home</Title>
+            </Body>
+          </Header>
+          <View style={styles.cryptoList}>
+            <FlatList
+              refreshing={this.state.isLoading}
+              onRefresh={() => this.reloadData()}
+              keyExtractor={(item, index) => item.id}
+              data={this.props.crypto.data}
+              renderItem={(item) => this.renderCryptoItem(item)}
+              showsVerticalScrollIndicator={false}
+              ListHeaderComponent={() => this.renderHeader()}
+            >
+            </FlatList>
+          </View>
+        </List>
       </View>
     );
   }
@@ -125,7 +146,6 @@ const styles = StyleSheet.create({
     flex: 1
   },
   cryptoList: {
-    marginTop: 25,
     paddingHorizontal: 5
   },
   cryptoItem: {
@@ -137,7 +157,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#040D14'
   },
   coinName: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#040D14',
     fontWeight: "600"
   },
@@ -164,6 +184,16 @@ const styles = StyleSheet.create({
   },
   percentText: {
     color: 'white'
+  },
+  filterBar: {
+    backgroundColor: '#FBFBFB',
+    padding: 10
+  },
+  filterBarText: {
+    height: 30,
+    borderRadius: 5,
+    backgroundColor: '#EEEEEE',
+    paddingHorizontal: 5
   }
 });
 

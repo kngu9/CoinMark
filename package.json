@@ -22,6 +22,7 @@
     "d3-shape": "^1.2.0",
     "expo": "^25.0.0",
     "moment": "^2.20.1",
+    "native-base": "^2.3.8",
     "react": "16.2.0",
     "react-native": "0.52.0",
     "react-native-flexbox-grid": "^0.3.2",

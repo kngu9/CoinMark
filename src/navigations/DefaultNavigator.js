@@ -10,15 +10,16 @@ export default TabNavigator({
 }, {
   animationEnabled: true,
   tabBarOptions: {
-    activeTintColor: '#E91E63',
+    showLabel: false,
+    activeTintColor: '#040D14',
     style: {
-      // backgroundColor: '#252525',
+      backgroundColor: '#FBFBFB',
     },
     labelStyle: {
       fontWeight: 'bold'
     },
     indicatorStyle: {
-      backgroundColor: '#E91E63',
+      backgroundColor: '#535353',
     }
   },
 });
