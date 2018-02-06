@@ -3,8 +3,6 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native
 import { Header, Left, Body, Right, Button, Title, List } from 'native-base';
 import { connect } from "react-redux";
 import { Ionicons } from '@expo/vector-icons';
-import { Column as Col, Row } from 'react-native-flexbox-grid';
-import * as shape from 'd3-shape'
 import moment from 'moment';
 
 import { getTicker } from '../api/coinmarketcap';
@@ -27,29 +25,17 @@ class HomeScreen extends React.Component {
     await this.reloadData()
   }
 
+  async selectItem (item) {
+    this.props.navigation.navigate('CryptoDetail', {crypto: item});
+  }
+
   renderCryptoItem({item}) {
-    let percentColor = '#CCCCCC';
-    const percentChanged = parseFloat(item.percent_change_24h);
-
-    if (percentChanged < 0.0) {
-      percentColor = '#F45532';
-    } else if (percentChanged > 0.0) {
-      percentColor = '#30CC9A';
-    }
-
-    let coinValue = `${item.percent_change_24h}%`;
-
-    if (this.state.currentView === 'money') {
-      coinValue = `$${(Math.round(100*parseFloat(item.price_usd))/100).toFixed(2)}`;
-    }
-
     return (
       <CryptoListItem
-        name={item.name}
-        symbol={item.symbol}
-        percentColor={percentColor}
-        coinValue={coinValue}
+        item={item}
+        currentView={this.state.currentView}
         changeView={() => this.changeView()}
+        onSelectItem={(item) => this.selectItem(item)}
       />
     );
   }
@@ -94,11 +80,10 @@ class HomeScreen extends React.Component {
   };
 
   render () {
-    console.log(this.props.navigation)
     return (
       <View style={styles.container}>
         <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}>
-          <Header searchBar rounded>
+          <Header>
             <Left>
             </Left>
             <Body>

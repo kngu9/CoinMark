@@ -4,19 +4,36 @@ import { Column as Col, Row } from 'react-native-flexbox-grid';
 
 export default class CryptoListItem extends React.PureComponent {
   render () {
-    let { name, symbol, coinValue, percentColor, changeView } = this.props;
+    let { item, currentView, changeView, onSelectItem } = this.props;
+
+    let percentColor = '#CCCCCC';
+    const percentChanged = parseFloat(item.percent_change_24h);
+
+    if (percentChanged < 0.0) {
+      percentColor = '#F45532';
+    } else if (percentChanged > 0.0) {
+      percentColor = '#30CC9A';
+    }
+
+    let coinValue = `${item.percent_change_24h}%`;
+
+    if (currentView === 'money') {
+      coinValue = `$${(Math.round(100*parseFloat(item.price_usd))/100).toFixed(2)}`;
+    }
+
     return (
       <TouchableOpacity
-      activeOpacity={1}
-      style={styles.cryptoItem}
+        activeOpacity={1}
+        style={styles.cryptoItem}
+        onPress={() => onSelectItem(item)}
       >
         <Row size={12}>
           <Col sm={6} md={6} lg={6} style={styles.cryptoItemStart}>
             <Text style={styles.coinName}>
-              { name }
+              { item.name }
             </Text>
             <Text style={styles.coinSymbol}>
-              { symbol }
+              { item.symbol }
             </Text>
           </Col>
           <Col sm={6} md={6} lg={6} style={styles.cryptoItemEnd}>
