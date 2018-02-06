@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { Header, Left, Body, Right, Button, Title, List } from 'native-base';
 import { connect } from "react-redux";
 import { Ionicons } from '@expo/vector-icons';
@@ -9,6 +9,7 @@ import moment from 'moment';
 
 import { getTicker } from '../api/coinmarketcap';
 import { updateCrypto } from '../actions/crypto';
+import CryptoListItem from '../components/CryptoListItem';
 
 class HomeScreen extends React.Component {
   state = {
@@ -36,38 +37,20 @@ class HomeScreen extends React.Component {
       percentColor = '#30CC9A';
     }
 
-    let coinValue = `${item.percent_change_24h} %`;
+    let coinValue = `${item.percent_change_24h}%`;
 
     if (this.state.currentView === 'money') {
       coinValue = `$${(Math.round(100*parseFloat(item.price_usd))/100).toFixed(2)}`;
     }
 
     return (
-      <TouchableOpacity
-        activeOpacity={1}
-        style={styles.cryptoItem}
-      >
-        <Row size={12}>
-          <Col sm={6} md={6} lg={6} style={styles.cryptoItemStart}>
-            <Text style={styles.coinName}>
-              {item.name}
-            </Text>
-            <Text style={styles.coinSymbol}>
-              {item.symbol}
-            </Text>
-          </Col>
-          <Col sm={6} md={6} lg={6} style={styles.cryptoItemEnd}>
-            <TouchableOpacity
-              activeOpacity={1}
-              style={[styles.percentChange, {backgroundColor: percentColor}]}
-              onPress={() => this.changeView()}>
-              <Text style={styles.percentText}>
-                { coinValue }
-              </Text>
-            </TouchableOpacity>
-          </Col>
-        </Row>
-      </TouchableOpacity>
+      <CryptoListItem
+        name={item.name}
+        symbol={item.symbol}
+        percentColor={percentColor}
+        coinValue={coinValue}
+        changeView={() => this.changeView()}
+      />
     );
   }
 
@@ -104,24 +87,28 @@ class HomeScreen extends React.Component {
 
   renderHeader () {
     return (
-      <View style={styles.filterBar}>
-        <TextInput
-          style={styles.filterBarText}
-          autoCorrect={false}
-          placeholder='Filter'
-        />
+      <View style={styles.searchBar}>
+      
       </View>
     );
   };
 
   render () {
+    console.log(this.props.navigation)
     return (
       <View style={styles.container}>
         <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}>
-          <Header>
+          <Header searchBar rounded>
+            <Left>
+            </Left>
             <Body>
               <Title>Home</Title>
             </Body>
+            <Right>
+              <Button transparent onPress={() => this.props.navigation.navigate('CryptoSearch')}>
+              <Ionicons name="md-search" size={24}/>
+              </Button>
+            </Right>
           </Header>
           <View style={styles.cryptoList}>
             <FlatList
@@ -131,7 +118,6 @@ class HomeScreen extends React.Component {
               data={this.props.crypto.data}
               renderItem={(item) => this.renderCryptoItem(item)}
               showsVerticalScrollIndicator={false}
-              ListHeaderComponent={() => this.renderHeader()}
             >
             </FlatList>
           </View>
@@ -143,26 +129,27 @@ class HomeScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: 'white'
   },
   cryptoList: {
-    paddingHorizontal: 5
+    paddingHorizontal: 12
   },
   cryptoItem: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 18,
+    paddingVertical: 14,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#040D14'
+    borderBottomColor: 'rgba(0, 0, 0, 0.2)'
   },
   coinName: {
-    fontSize: 14,
-    color: '#040D14',
+    fontSize: 16,
+    color: '#333',
     fontWeight: "600"
   },
   coinSymbol: {
-    fontSize: 10,
+    fontSize: 12,
     color: '#7F7F7F'
   },
   cryptoItemStart: {
@@ -184,16 +171,6 @@ const styles = StyleSheet.create({
   },
   percentText: {
     color: 'white'
-  },
-  filterBar: {
-    backgroundColor: '#FBFBFB',
-    padding: 10
-  },
-  filterBarText: {
-    height: 30,
-    borderRadius: 5,
-    backgroundColor: '#EEEEEE',
-    paddingHorizontal: 5
   }
 });
 

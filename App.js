@@ -6,7 +6,7 @@ import logger from 'redux-logger';
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
-import DefaultNavigator from './src/navigations/DefaultNavigator';
+import MainNavigator from './src/navigations/MainNavigator';
 import rootReducer from './src/reducers';
 
 const persistConfig = {
@@ -29,7 +29,7 @@ export default class App extends React.Component {
     return (
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <DefaultNavigator />
+          <MainNavigator />
         </PersistGate>
       </Provider>
     );
