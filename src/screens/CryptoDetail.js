@@ -3,28 +3,60 @@ import { StyleSheet, Text, View, TextInput } from 'react-native';
 import { Header, Left, Body, Right, Button, Title, List, Subtitle } from 'native-base';
 import { connect } from "react-redux";
 import { Ionicons } from '@expo/vector-icons';
-import { VictoryLine, VictoryTheme, VictoryCursorContainer } from "victory-native";
+import { VictoryLine, VictoryTheme, VictoryVoronoiContainer, VictoryChart, VictoryLabel, VictoryAxis } from "victory-native";
+import Spinner from 'react-native-loading-spinner-overlay';
 
 import { random, range, round } from "lodash";
 import { getHistorical } from '../api/coinmarketcap';
 
-class CryptoDetailScreen extends React.Component {
-  async componentDidMount() {
-    console.log('test');
-    let { id } = this.props.navigation.state.params.crypto;
+import moment from 'moment';
 
-    let data = await getHistorical(id, 0);
+class CryptoDetailScreen extends React.Component {
+  state = {
+    loading: false,
+    priceData: []
+  };
+
+  constructor (props) {
+    super(props);
+
+    this.timer = null;
   }
 
-  generateRandomData(points = 6) {
-    return range(1, points + 1).map((i) => ({ x: i, y: i + random(-1, 2) }));
+  async componentDidMount() {
+    this.setState({loading: true}, async () => {
+      let { id } = this.props.navigation.state.params.crypto;
+
+      let data = await getHistorical(id, 0);
+  
+      let priceData = data.price_usd.map((price) => {
+        return {
+          x: price[0],
+          y: price[1],
+          date: moment(price[0]/1000).format("MM/YYYY")
+        }
+      });
+  
+      this.setState({priceData: priceData, loading: false});
+    })
+  }
+
+  startListener () {
+    this.timer = setTimeout(this.startListener.bind(this), 1);
+  }
+
+  stopListener () {
+    clearTimeout(this.timer);
   }
 
   render () {
-    let { name, symbol } = this.props.navigation.state.params.crypto;
+    let { name, symbol, percent_change_24h } = this.props.navigation.state.params.crypto;
+
+    const percentChanged = parseFloat(percent_change_24h);
 
     return (
       <View style={styles.container}>
+        <Spinner visible={this.state.loading} textContent={"Loading..."} textStyle={{color: '#FFF'}} />
         <Header>
           <Left>
             <Button style={{padding: 5}} transparent onPress={() => this.props.navigation.goBack()}>
@@ -41,21 +73,32 @@ class CryptoDetailScreen extends React.Component {
           </Body>
           <Right />
         </Header>
-        <VictoryLine
+        <VictoryChart
           theme={VictoryTheme.material}
-          animate={{
-            duration: 1000,
-            onLoad: { duration: 500 }
-          }}
-          data={this.generateRandomData()}
+          domainPadding={{ x: 50, y: 10 }}
+          scale={{ x: "time" }}
           containerComponent={
-            <VictoryCursorContainer
-              onTouchStart={() => console.log('test')}
-              onTouchEnd={() => console.log('test')}
-              // cursorLabel={(d) => (`${round(d.x, 2)} , ${round(d.y, 2)}`)}
+            <VictoryVoronoiContainer
+              labels={(d) => `$${round(d.y, 2)}`}
             />
           }
-        />
+        >
+          <VictoryAxis
+            active={false}
+            theme={VictoryTheme.material}
+          />
+          <VictoryAxis
+            theme={VictoryTheme.material}
+            dependentAxis
+          />
+          <VictoryLine
+            theme={VictoryTheme.material}
+            data={this.state.priceData}
+            style={{
+              data: { stroke: percentChanged < 0.0 ? '#F45532' : '#30CC9A' }
+            }}
+          />
+        </VictoryChart>
       </View>
     );
   }
