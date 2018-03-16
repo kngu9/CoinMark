@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TextInput, FlatList } from 'react-native';
 import { Header, Left, Body, Right, Button, Title, List } from 'native-base';
 import { connect } from "react-redux";
 import { Ionicons } from '@expo/vector-icons';
@@ -8,8 +8,59 @@ import moment from 'moment';
 
 import { getTicker } from '../api/coinmarketcap';
 import { updateCrypto } from '../actions/crypto';
+import CryptoListItem from '../components/CryptoListItem';
 
 class CryptoSearchScreen extends React.Component {
+  state = {
+    searchedText: '',
+    currentView: 'percent',
+    results: []
+  };
+
+  changedText (text) {
+    this.setState({searchedText: text}, () => {
+      const { searchedText } = this.state;
+
+      const results = this.props.crypto.data.filter((crypto) => {
+        
+        if (crypto.name.toLowerCase().indexOf(searchedText.toLowerCase()) > -1 ||
+            crypto.symbol.toLowerCase().indexOf(searchedText.toLowerCase()) > -1)
+            return crypto;
+      });
+
+      this.setState({results});
+    });
+  }
+
+  changeView () {
+    switch(this.state.currentView) {
+      case 'percent':
+        this.setState({currentView: 'money'});
+        break;
+      case 'money':
+        this.setState({currentView: 'percent'});
+        break;
+      default:
+        this.setState({currentView: 'percent'});
+        break;
+    }
+  }
+
+  async selectItem (item) {
+    this.props.navigation.navigate('CryptoDetail', {crypto: item});
+  }
+
+  renderCryptoItem({item}) {
+    return (
+      <CryptoListItem
+        item={item}
+        currentView={this.state.currentView}
+        changeView={() => this.changeView()}
+        onSelectItem={(item) => this.selectItem(item)}
+      />
+    );
+  }
+
   render () {
     return (
       <View style={styles.container}>
@@ -24,9 +75,22 @@ class CryptoSearchScreen extends React.Component {
               </Button>
             </Col>
             <Col sm={9} md={9} lg={9} style={{marginTop: 5}}>
-              <TextInput placeholder="Search" style={styles.searchInput} />
+              <TextInput
+                placeholder="Search"
+                style={styles.searchInput} 
+                onChangeText={(text) => this.changedText(text)}
+                autoCorrect={false}
+                />
             </Col>
           </Row>
+        </View>
+
+        <View style={styles.cryptoList}>
+          <FlatList
+            keyExtractor={(item, index) => item.id}
+            data={this.state.results}
+            renderItem={(item) => this.renderCryptoItem(item)}
+            showsVerticalScrollIndicator={false}/>
         </View>
       </View>
     );
@@ -36,29 +100,35 @@ class CryptoSearchScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    flexDirection: 'column'
   },
   searchRow: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
     paddingHorizontal: 20,
     flexDirection: 'column'
   },
   searchMargin: {
-    backgroundColor: '#F8F8F8',
-    marginTop: 40
+    marginTop: 40,
+    marginBottom: 20
   },
   searchInput: {
     height: 30,
     width: '100%',
     backgroundColor: '#ECECEC',
-    padding: 5,
-    
+    padding: 5
+  },
+  cryptoList: {
+    marginTop: 30,
+    paddingHorizontal: 12,
+    flex: 1,
+    flexDirection: 'row'
   }
 });
 
 function mapStateToProps (state) {
   return {
+    crypto: state.crypto
   };
 }
 
