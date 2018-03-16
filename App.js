@@ -1,4 +1,5 @@
 import React from 'react';
+import { AppLoading } from 'expo';
 import { Provider } from 'react-redux';
 import { applyMiddleware, createStore } from 'redux';
 import { PersistGate } from 'redux-persist/lib/integration/react'
@@ -19,13 +20,22 @@ const store = createStore(persistedReducer, applyMiddleware(logger));
 const persistor = persistStore(store);
 
 export default class App extends React.Component {
+  state = {
+    fontLoaded: false
+  }
+
   async componentWillMount() {
     await Expo.Font.loadAsync({
       'Roboto': require('native-base/Fonts/Roboto.ttf'),
       'Roboto_medium': require('native-base/Fonts/Roboto_medium.ttf'),
     });
+
+    this.setState({fontLoaded: true})
   }  
   render() {
+    if (!this.state.fontLoaded)
+      return <AppLoading />;
+      
     return (
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
