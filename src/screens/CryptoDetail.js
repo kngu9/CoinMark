@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { Ionicons } from '@expo/vector-icons';
 import { VictoryLine, VictoryTheme, VictoryVoronoiContainer, VictoryChart, VictoryLabel, VictoryAxis } from "victory-native";
 import Spinner from 'react-native-loading-spinner-overlay';
+import SegmentedControlTab from 'react-native-segmented-control-tab'
 
 import { random, range, round } from "lodash";
 import { getHistorical } from '../api/coinmarketcap';
@@ -14,7 +15,8 @@ import moment from 'moment';
 class CryptoDetailScreen extends React.Component {
   state = {
     loading: false,
-    priceData: []
+    priceData: [],
+    selectedIndex: 0
   };
 
   constructor (props) {
@@ -41,18 +43,49 @@ class CryptoDetailScreen extends React.Component {
     })
   }
 
-  startListener () {
-    this.timer = setTimeout(this.startListener.bind(this), 1);
-  }
+  renderGraph() {
+    let { percent_change_24h } = this.props.navigation.state.params.crypto;
+    let { priceData } = this.state;
 
-  stopListener () {
-    clearTimeout(this.timer);
+    const percentChanged = parseFloat(percent_change_24h);
+
+    if (this.state.priceData.length > 0)
+      return (
+        <View>
+          <VictoryChart
+            theme={VictoryTheme.material}
+            domainPadding={{ x: 50, y: 10 }}
+            scale={{ x: "time" }}
+            containerComponent={
+              <VictoryVoronoiContainer
+                labels={(d) => `$${round(d.y, 2)}`}
+              />
+            }
+          >
+            <VictoryAxis
+              active={false}
+              theme={VictoryTheme.material}
+            />
+            <VictoryAxis
+              theme={VictoryTheme.material}
+              dependentAxis
+            />
+            <VictoryLine
+              theme={VictoryTheme.material}
+              data={this.state.priceData}
+              style={{
+                data: { stroke: percentChanged < 0.0 ? '#F45532' : '#30CC9A' }
+              }}
+            />
+          </VictoryChart>
+        </View>
+      );
+
+    return <View />;
   }
 
   render () {
-    let { name, symbol, percent_change_24h } = this.props.navigation.state.params.crypto;
-
-    const percentChanged = parseFloat(percent_change_24h);
+    let { name, symbol } = this.props.navigation.state.params.crypto;
 
     return (
       <View style={styles.container}>
@@ -73,32 +106,15 @@ class CryptoDetailScreen extends React.Component {
           </Body>
           <Right />
         </Header>
-        <VictoryChart
-          theme={VictoryTheme.material}
-          domainPadding={{ x: 50, y: 10 }}
-          scale={{ x: "time" }}
-          containerComponent={
-            <VictoryVoronoiContainer
-              labels={(d) => `$${round(d.y, 2)}`}
-            />
-          }
-        >
-          <VictoryAxis
-            active={false}
-            theme={VictoryTheme.material}
-          />
-          <VictoryAxis
-            theme={VictoryTheme.material}
-            dependentAxis
-          />
-          <VictoryLine
-            theme={VictoryTheme.material}
-            data={this.state.priceData}
-            style={{
-              data: { stroke: percentChanged < 0.0 ? '#F45532' : '#30CC9A' }
-            }}
-          />
-        </VictoryChart>
+        <View style={styles.innerContainer}>
+          {this.renderGraph()}
+          <View>
+            <SegmentedControlTab
+              values={['All', '5y', '3y', '1y', '1m']}
+              selectedIndex={this.state.selectedIndex}
+              onTabPress={(i) => this.setState({selectedIndex: i})} />
+          </View>
+        </View>
       </View>
     );
   }
@@ -108,6 +124,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white'
+  },
+  innerContainer: {
+    marginHorizontal: 10
   }
 });
 
