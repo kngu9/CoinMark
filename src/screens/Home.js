@@ -71,23 +71,23 @@ class HomeScreen extends React.Component {
     }
   }
 
-  renderHeader () {
-    return (
-      <View style={styles.searchBar}>
-      
-      </View>
-    );
-  };
+//  renderHeader () {
+//    return (
+//      <View style={styles.searchBar}>
+
+//      </View>
+//    );
+//  };
 
   render () {
     return (
       <View style={styles.container}>
         <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}>
-          <Header>
+          <Header style={{ backgroundColor: 'white'}}>
             <Left>
             </Left>
             <Body>
-              <Title>Home</Title>
+              <Title style={{color: 'black'}}>Home</Title>
             </Body>
             <Right>
               <Button transparent onPress={() => this.props.navigation.navigate('CryptoSearch')}>
