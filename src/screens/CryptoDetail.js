@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput } from 'react-native';
-import { Header, Left, Body, Right, Button, Title, List, Subtitle } from 'native-base';
+import { StyleSheet, View, TextInput } from 'react-native';
+import { Header, Left, Body, Right, Button, Title, List, Subtitle, Text } from 'native-base';
 import { connect } from "react-redux";
 import { Ionicons } from '@expo/vector-icons';
 import { VictoryLine, VictoryTheme, VictoryVoronoiContainer, VictoryChart, VictoryLabel, VictoryAxis } from "victory-native";
@@ -54,7 +54,7 @@ class CryptoDetailScreen extends React.Component {
         <View>
           <VictoryChart
             theme={VictoryTheme.material}
-            domainPadding={{ x: 50, y: 10 }}
+            domainPadding={{ x: 10, y: 10 }}
             scale={{ x: "time" }}
             containerComponent={
               <VictoryVoronoiContainer
@@ -98,7 +98,7 @@ class CryptoDetailScreen extends React.Component {
           break;
         case 1: // YTD
           const start = moment().startOf('year');
-          
+
           days = moment(new Date()).diff(start, 'days');
           break;
         case 2: // 1y
@@ -165,6 +165,14 @@ class CryptoDetailScreen extends React.Component {
               selectedIndex={this.state.selectedIndex}
               onTabPress={(i) => this.changeGraph(i)} />
           </View>
+          <View style={styles.buttonContainer}>
+            <Button
+              block
+              onPress={() => alert('Need to implement')}
+            >
+              <Text>Add To Portfolio</Text>
+            </Button>
+          </View>
         </View>
       </View>
     );
@@ -178,6 +186,9 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     marginHorizontal: 10
+  },
+  buttonContainer: {
+    marginTop: 20
   }
 });
 
