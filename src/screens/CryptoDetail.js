@@ -26,11 +26,13 @@ class CryptoDetailScreen extends React.Component {
   }
 
   async componentDidMount () {
+    // On load, pulls the data for graphign based on the crypto coin user has selected
     this.setState({loading: true}, async () => {
       let { id } = this.props.navigation.state.params.crypto;
 
       let data = await getHistorical(id, 0);
-  
+ 
+      // Does basic ETL to display the graph
       let priceData = data.price_usd.map((price) => {
         return {
           x: price[0],
@@ -48,7 +50,7 @@ class CryptoDetailScreen extends React.Component {
     let { priceData } = this.state;
 
     const percentChanged = parseFloat(percent_change_24h);
-
+    // Make sure that there is data to draw
     if (this.state.priceData.length > 0)
       return (
         <View>
@@ -85,6 +87,7 @@ class CryptoDetailScreen extends React.Component {
   }
 
   changeGraph (i) {
+    // Handler to handle the different types of user options such as 1 year, 3 months, etc...
     let { id } = this.props.navigation.state.params.crypto;
 
     this.setState({selectedIndex: i, loading: true}, async () => {
@@ -137,7 +140,8 @@ class CryptoDetailScreen extends React.Component {
 
   render () {
     let { name, symbol } = this.props.navigation.state.params.crypto;
-
+    
+    // Draws the component
     return (
       <View style={styles.container}>
         <Spinner visible={this.state.loading} textContent={"Loading..."} textStyle={{color: '#FFF'}} />
