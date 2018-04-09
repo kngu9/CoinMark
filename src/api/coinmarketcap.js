@@ -10,10 +10,12 @@ const getTicker = async () => {
 }
 
 const getHistorical = async (coin, length) => {
+  // If length is invalid, get default length
   if (length <= 0) {
     const body = await fetch(`${GRAPH_URI}${coin}/`);
     return await body.json();
   } else {
+    // Convert length to unix timestamp
     const end = moment().unix() * 1000;
     const start = end - (((24 * 60 * 60) * length) * 1000);
     
