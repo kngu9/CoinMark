@@ -91,7 +91,7 @@ class HomeScreen extends React.Component {
             </Body>
             <Right>
               <Button transparent onPress={() => this.props.navigation.navigate('CryptoSearch')}>
-              <Ionicons name="md-search" size={24}/>
+                <Ionicons name="md-search" size={24}/>
               </Button>
             </Right>
           </Header>
