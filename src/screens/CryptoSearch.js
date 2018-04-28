@@ -18,16 +18,20 @@ class CryptoSearchScreen extends React.Component {
   };
 
   changedText (text) {
+    // This is the handler for everytime a user types in something
     this.setState({searchedText: text}, () => {
+      // Deconstructs the searched text out of the current state
       const { searchedText } = this.state;
-
+      
+      // Does a linear search in memory to find the substring that the user is looking for
       const results = this.props.crypto.data.filter((crypto) => {
         
         if (crypto.name.toLowerCase().indexOf(searchedText.toLowerCase()) > -1 ||
             crypto.symbol.toLowerCase().indexOf(searchedText.toLowerCase()) > -1)
             return crypto;
       });
-
+      
+      // Sets the results found
       this.setState({results});
     });
   }
@@ -47,10 +51,12 @@ class CryptoSearchScreen extends React.Component {
   }
 
   async selectItem (item) {
+    // Handler for when a user selects a crypto item
     this.props.navigation.navigate('CryptoDetail', {crypto: item});
   }
 
   renderCryptoItem({item}) {
+    // Draws the individual crypto menu
     return (
       <CryptoListItem
         item={item}
@@ -62,6 +68,7 @@ class CryptoSearchScreen extends React.Component {
   }
 
   render () {
+    // Draws the main search page
     return (
       <View style={styles.container}>
         <View style={styles.searchMargin}>

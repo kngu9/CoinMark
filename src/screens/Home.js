@@ -41,6 +41,7 @@ class HomeScreen extends React.Component {
   }
 
   changeView () {
+    // This controls what is the next state for the ticker view
     switch(this.state.currentView) {
       case 'percent':
         this.setState({currentView: 'money'});
@@ -55,6 +56,7 @@ class HomeScreen extends React.Component {
   }
 
   async reloadData () {
+    // Reloads the data if data is older than 5 minutes old
     if (moment(this.props.crypto.lastReloaded).diff(new Date(), 'minutes') <= 5) {
       this.setState(
         {
@@ -80,6 +82,7 @@ class HomeScreen extends React.Component {
 //  };
 
   render () {
+    // Renders the component
     return (
       <View style={styles.container}>
         <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}>
