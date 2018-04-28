@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { Ionicons } from '@expo/vector-icons';
 
 import NewPortfolioModal from '../components/NewPortfolioModal';
-
+import { addPortfolio } from '../actions/portfolio';
 class PortfolioScreen extends React.Component {
   static navigationOptions = {
     tabBarIcon: ({ tintColor }) => (
@@ -22,6 +22,7 @@ class PortfolioScreen extends React.Component {
   }
 
   addPortfolio(name) {
+    this.props.addPortfolio(name);
     this.setModalVisible(false);
   }
 
@@ -61,12 +62,13 @@ const styles = StyleSheet.create({
 
 function mapStateToProps (state) {
   return {
-    
+    portfolio: state.portfolio
   };
 }
 
 function mapDispatchToProps (dispatch) {
   return {
+    addPortfolio: (name) => dispatch(addPortfolio(name))
   };
 }
 

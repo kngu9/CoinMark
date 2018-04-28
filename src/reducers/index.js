@@ -1,9 +1,11 @@
 import { combineReducers } from "redux";
 import crypto from './crypto';
+import portfolio from './portfolio';
 
 // Combine reducers
 const itemApp = combineReducers({
-  crypto
+  crypto,
+  portfolio
 });
 
 export default itemApp;

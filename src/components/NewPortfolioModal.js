@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   innerContainer: {
     backgroundColor: 'white',
     width: 300,
-    height: 150,
+    height: 120,
     borderRadius: 5,
     padding: 10
   }
