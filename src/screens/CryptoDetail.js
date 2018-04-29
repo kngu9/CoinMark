@@ -9,6 +9,9 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
 
 import { random, range, round } from "lodash";
 import { getHistorical } from '../api/coinmarketcap';
+import { addToPortfolio } from '../actions/portfolio';
+
+import PortfolioSelect from '../components/PortfolioSelect';
 
 import moment from 'moment';
 
@@ -16,7 +19,8 @@ class CryptoDetailScreen extends React.Component {
   state = {
     loading: false,
     priceData: [],
-    selectedIndex: 0
+    selectedIndex: 0,
+    modalVisible: false
   };
 
   constructor (props) {
@@ -138,6 +142,10 @@ class CryptoDetailScreen extends React.Component {
     });
   }
 
+  addPortfolio (index) {
+    this.props.addToPortfolio(index, this.props.navigation.state.params.crypto.symbol)
+  }
+
   render () {
     let { name, symbol } = this.props.navigation.state.params.crypto;
     
@@ -172,12 +180,19 @@ class CryptoDetailScreen extends React.Component {
           <View style={styles.buttonContainer}>
             <Button
               block
-              onPress={() => alert('Need to implement')}
+              onPress={() => this.setState({modalVisible: true})}
             >
               <Text>Add To Portfolio</Text>
             </Button>
           </View>
         </View>
+
+        <PortfolioSelect
+          visible={this.state.modalVisible}
+          close={() => this.setState({modalVisible: false})}
+          data={this.props.portfolio.portfolios}
+          onSelect={(item) => this.addPortfolio(item)}
+        />
       </View>
     );
   }
@@ -198,12 +213,13 @@ const styles = StyleSheet.create({
 
 function mapStateToProps (state) {
   return {
-    
+    portfolio: state.portfolio
   };
 }
 
 function mapDispatchToProps (dispatch) {
   return {
+    addToPortfolio: (index, symbol) => dispatch(addToPortfolio(index, symbol))
   };
 }
 

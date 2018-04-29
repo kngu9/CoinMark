@@ -30,6 +30,7 @@
     "react-native-loading-spinner-overlay": "^0.5.2",
     "react-native-segmented-control-tab": "^3.2.2",
     "react-native-svg": "5.5.1",
+    "react-native-swipeout": "^2.3.3",
     "react-navigation": "^1.0.0-beta.27",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",

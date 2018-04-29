@@ -6,10 +6,9 @@ import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 
 import { getTicker } from '../api/coinmarketcap';
-import { updateCrypto } from '../actions/crypto';
 import CryptoListItem from '../components/CryptoListItem';
 
-class HomeScreen extends React.Component {
+class PortfolioDetail extends React.Component {
   state = {
     isLoading: false,
     currentView: 'percent'
@@ -20,10 +19,6 @@ class HomeScreen extends React.Component {
       <Ionicons name="md-home" size={32} color={tintColor} />
     ),
   };
-
-  async componentDidMount () {
-    await this.reloadData()
-  }
 
   async selectItem (item) {
     this.props.navigation.navigate('CryptoDetail', {crypto: item});
@@ -55,34 +50,31 @@ class HomeScreen extends React.Component {
     }
   }
 
-  async reloadData () {
-    // Reloads the data if data is older than 5 minutes old
-    if (moment(this.props.crypto.lastReloaded).diff(new Date(), 'minutes') <= 5) {
-      this.setState(
-        {
-          isLoading: true
-        },
-        async () => {
-          let data = await getTicker();
-
-          this.props.updateCrypto(data);
-
-          this.setState({ isLoading: false });
-        }
-      );
-    }
-  }
-
   render () {
-    // Renders the component
+    let { name, coins } = this.props.navigation.state.params.data;
+
+    const data = coins.map((symbol) => {
+      return this.props.crypto.data.find((item) => {
+        if (item.symbol == symbol) {
+          console.log(item);
+          return item;
+        }
+      })
+    });
+
+    console.log(data);
+
     return (
       <View style={styles.container}>
         <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}>
           <Header style={{ backgroundColor: 'white'}}>
             <Left>
+              <Button style={{padding: 5}} transparent onPress={() => this.props.navigation.goBack()}>
+                <Ionicons name="ios-arrow-back" size={24}/>
+              </Button>
             </Left>
             <Body>
-              <Title style={{color: 'black'}}>Home</Title>
+              <Title style={{color: 'black'}}>{name}</Title>
             </Body>
             <Right>
               <Button transparent onPress={() => this.props.navigation.navigate('CryptoSearch')}>
@@ -93,9 +85,8 @@ class HomeScreen extends React.Component {
           <View style={styles.cryptoList}>
             <FlatList
               refreshing={this.state.isLoading}
-              onRefresh={() => this.reloadData()}
-              keyExtractor={(item, index) => item.id}
-              data={this.props.crypto.data}
+              keyExtractor={(item, index) => index}
+              data={data}
               renderItem={(item) => this.renderCryptoItem(item)}
               showsVerticalScrollIndicator={false}
             >
@@ -162,8 +153,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    updateCrypto: (newData) => dispatch(updateCrypto(newData))
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(PortfolioDetail);

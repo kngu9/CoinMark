@@ -3,6 +3,7 @@ import { StackNavigator } from 'react-navigation';
 import DefaultNavigator from './DefaultNavigator';
 import CryptoSearchScreen from '../screens/CryptoSearch';
 import CryptoDetailScreen from '../screens/CryptoDetail';
+import PortfolioDetailScreen from '../screens/PortfolioDetail';
 
 export default StackNavigator({
   Default: {
@@ -13,6 +14,9 @@ export default StackNavigator({
   },
   CryptoDetail: {
     screen: CryptoDetailScreen
+  },
+  PortfolioDetail: {
+    screen: PortfolioDetailScreen
   }
 }, {
   navigationOptions: {

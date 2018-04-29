@@ -1,11 +1,14 @@
 import React from 'react';
-import { StyleSheet, View, TextInput, Modal, TouchableHighlight } from 'react-native';
+import { StyleSheet, View, TextInput, Modal, TouchableHighlight, FlatList } from 'react-native';
 import { Header, Left, Body, Right, Button, Title, List, Subtitle, Text } from 'native-base';
 import { connect } from "react-redux";
 import { Ionicons } from '@expo/vector-icons';
 
 import NewPortfolioModal from '../components/NewPortfolioModal';
+import CryptoListItem from '../components/CryptoListItem';
+
 import { addPortfolio } from '../actions/portfolio';
+
 class PortfolioScreen extends React.Component {
   static navigationOptions = {
     tabBarIcon: ({ tintColor }) => (
@@ -26,6 +29,22 @@ class PortfolioScreen extends React.Component {
     this.setModalVisible(false);
   }
 
+  selectItem (item) {
+    this.props.navigation.navigate('PortfolioDetail', {data: item});
+  }
+
+  renderCryptoItem({item}) {
+    return (
+      <CryptoListItem
+        item={item}
+        currentView={this.state.currentView}
+        changeView={() => this.changeView()}
+        onSelectItem={(item) => this.selectItem(item)}
+        longPress={(item) => console.log(item)}
+      />
+    );
+  }
+
   render () {
     return (
       <View style={styles.container}>
@@ -42,6 +61,17 @@ class PortfolioScreen extends React.Component {
             </Button>
           </Right>
         </Header>
+
+        <View style={styles.cryptoList}>
+            <FlatList
+              refreshing={this.state.isLoading}
+              keyExtractor={(item, index) => index}
+              data={this.props.portfolio.portfolios}
+              renderItem={(item) => this.renderCryptoItem(item)}
+              showsVerticalScrollIndicator={false}
+            >
+            </FlatList>
+        </View>
         
         <NewPortfolioModal
           close={() => this.setModalVisible(false)}
@@ -57,7 +87,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white'
-  }
+  },
+  cryptoList: {
+    paddingHorizontal: 12
+  },
 });
 
 function mapStateToProps (state) {

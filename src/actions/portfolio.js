@@ -7,4 +7,12 @@ const addPortfolio = (name) => {
   };
 };
 
-export { addPortfolio };
+const addToPortfolio = (index, symbol) => {
+  return {
+    type: actionTypes.ADD_TO_PORTFOLIO,
+    index,
+    symbol
+  }
+}
+
+export { addPortfolio, addToPortfolio };

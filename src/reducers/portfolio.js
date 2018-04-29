@@ -13,6 +13,11 @@ export default (state = initialState, action) => {
       });
 
       return { ...state, portfolios: state.portfolios };
+    case actionTypes.ADD_TO_PORTFOLIO:
+      if (state.portfolios[action.index].coins.indexOf(action.symbol) === -1)
+        state.portfolios[action.index].coins.push(action.symbol)
+
+      return { ...state, portfolios: state.portfolios };
     default:
       return state;
   }

@@ -6,9 +6,10 @@ export default class CryptoListItem extends React.PureComponent {
   render () {
     // Deconstruct props to get parameters passed
     let { item, currentView, changeView, onSelectItem } = this.props;
-
+    const percent = item.percent_change_24h ? item.percent_change_24h : 0.0;
     let percentColor = '#CCCCCC';
-    const percentChanged = parseFloat(item.percent_change_24h);
+
+    const percentChanged = parseFloat(percent);
     
     // If percentage changed is negative, then change the color to red else green
     if (percentChanged < 0.0) {
@@ -18,12 +19,19 @@ export default class CryptoListItem extends React.PureComponent {
     }
     
     // Construct the string
-    let coinValue = `${item.percent_change_24h}%`;
+    let coinValue = `${percent}%`;
     
     // If the current view is money, change view to USD
     if (currentView === 'money') {
       coinValue = `$${(Math.round(100*parseFloat(item.price_usd))/100).toFixed(2)}`;
     }
+
+    const symbol = item.symbol ?
+      <Text style={styles.coinSymbol}>
+        { item.symbol }
+      </Text>
+      :
+      <View/>;
     
     // Draw the component
     return (
@@ -37,9 +45,7 @@ export default class CryptoListItem extends React.PureComponent {
             <Text style={styles.coinName}>
               { item.name }
             </Text>
-            <Text style={styles.coinSymbol}>
-              { item.symbol }
-            </Text>
+            { symbol }
           </Col>
           <Col sm={6} md={6} lg={6} style={styles.cryptoItemEnd}>
             <TouchableOpacity
