@@ -34,9 +34,28 @@ class PortfolioScreen extends React.Component {
   }
 
   renderCryptoItem({item}) {
+    let percentage = item.coins.map((symbol) => {
+      return this.props.crypto.data.find((item) => {
+        if (item.symbol == symbol) {
+          return item;
+        }
+      });
+    });
+
+    let aggregate = 0;
+
+    if (item.coins.length > 0) {
+      percentage.forEach((item) => {
+        aggregate += parseFloat(item.percent_change_24h)
+      })
+
+      aggregate /= item.coins.length;
+    }
+
     return (
       <CryptoListItem
         item={item}
+        percentage={aggregate}
         currentView={this.state.currentView}
         changeView={() => this.changeView()}
         onSelectItem={(item) => this.selectItem(item)}
@@ -95,7 +114,8 @@ const styles = StyleSheet.create({
 
 function mapStateToProps (state) {
   return {
-    portfolio: state.portfolio
+    portfolio: state.portfolio,
+    crypto: state.crypto
   };
 }
 

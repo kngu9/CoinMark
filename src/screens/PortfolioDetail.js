@@ -21,7 +21,7 @@ class PortfolioDetail extends React.Component {
   };
 
   async selectItem (item) {
-    this.props.navigation.navigate('CryptoDetail', {crypto: item});
+    this.props.navigation.navigate('CryptoDetail', {crypto: item, fromPortfolio: true});
   }
 
   renderCryptoItem({item}) {
@@ -61,8 +61,6 @@ class PortfolioDetail extends React.Component {
         }
       })
     });
-
-    console.log(data);
 
     return (
       <View style={styles.container}>

@@ -6,11 +6,13 @@ export default class CryptoListItem extends React.PureComponent {
   render () {
     // Deconstruct props to get parameters passed
     let { item, currentView, changeView, onSelectItem } = this.props;
-    const percent = item.percent_change_24h ? item.percent_change_24h : 0.0;
+    let percent = item.percent_change_24h ? item.percent_change_24h : 0.0;
     let percentColor = '#CCCCCC';
 
-    const percentChanged = parseFloat(percent);
+    const percentChanged = this.props.percentage ? this.props.percentage : parseFloat(percent);
     
+    if (this.props.percentage)
+      percent = this.props.percentage;
     // If percentage changed is negative, then change the color to red else green
     if (percentChanged < 0.0) {
       percentColor = '#F45532';
@@ -39,6 +41,7 @@ export default class CryptoListItem extends React.PureComponent {
         activeOpacity={1}
         style={styles.cryptoItem}
         onPress={() => onSelectItem(item)}
+        onLongPress={() => this.props.longPress(item)}
       >
         <Row size={12}>
           <Col sm={6} md={6} lg={6} style={styles.cryptoItemStart}>
